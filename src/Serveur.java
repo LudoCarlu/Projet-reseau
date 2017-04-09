@@ -1,41 +1,33 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.io.*;
+import java.net.*;
+import java.util.ArrayList;
+
 
 public class Serveur {
+	
+	 public static ServerSocket socketduserveur = null;
+	 public static Thread t;
+	 public static int port = 2017;
+	 
+	 public static ArrayList<Socket> listeDesClients = new ArrayList<Socket>();
 
-	public static void main (String[] args) {
-		ServerSocket socketserver  ;
-		Socket socketduserveur ;
-		BufferedReader in;
-		PrintWriter out;
-		
+	public static void main(String[] args) {
+
 		try {
 			
-			socketserver = new ServerSocket(2009);
-			System.out.println("Serveur port = "+socketserver.getLocalPort());
-			Thread t = new Thread(new ThreadClient(socketserver));
+			socketduserveur = new ServerSocket(port);
+			System.out.println("Le serveur est à l'écoute du port "+socketduserveur.getLocalPort());
+			Thread t = new Thread(new Acceptation_clients(socketduserveur));
 			t.start();
-			/*
-			//On obtient le socket du serveur après la connexion
-			socketduserveur = socketserver.accept(); 
-			System.out.println("Quelqu'un s'est connecté !");
-			
-			//On l'utilise pour générer un flux sortant
-			out = new PrintWriter(socketduserveur.getOutputStream());
-			//print : pour parler au client
-			out.println("Client vous êtes connecté");
-			//On vide le buffer
-			out.flush();
-			*/
-			//Fermeture de la connexion
-			//socketserver.close();
-			//socketduserveur.close();
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("Le port "+socketduserveur.getLocalPort()+" est déjà utilisé !");
 		}
 	}
+	
 }
+
+/*
+ * Quand il y a plusieurs clients des espaces se créé pour que le serveur parle à un a la fois (bug)
+ * Il faudrait que le serveur ait une liste de ses clients et qu'il envoi le même message à tous ses clients
+ */
